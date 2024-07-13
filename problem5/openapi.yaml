@@ -1,0 +1,166 @@
+openapi: 3.0.0
+info:
+  title: My Express Application API
+  description: API documentation for My Express Application.
+  version: 1.0.0
+servers:
+  - url: http://localhost:5000/api/v1
+    description: Local server
+paths:
+  /resources:
+    get:
+      summary: Get all resources
+      description: Retrieve a paginated list of resources with optional search and filter by price.
+      parameters:
+        - name: search
+          in: query
+          description: Search term for name and description.
+          required: false
+          schema:
+            type: string
+        - name: page
+          in: query
+          description: Page number for pagination.
+          required: false
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          description: Number of items per page.
+          required: false
+          schema:
+            type: integer
+            default: 10
+        - name: minPrice
+          in: query
+          description: Minimum price filter.
+          required: false
+          schema:
+            type: number
+        - name: maxPrice
+          in: query
+          description: Maximum price filter.
+          required: false
+          schema:
+            type: number
+      responses:
+        '200':
+          description: A paginated list of resources.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  totalItems:
+                    type: integer
+                  totalPages:
+                    type: integer
+                  currentPage:
+                    type: integer
+                  resources:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Resource'
+    post:
+      summary: Create a new resource
+      description: Create a new resource with the provided details.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResourceInput'
+      responses:
+        '201':
+          description: Resource created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+  /resources/{id}:
+    get:
+      summary: Get a resource by ID
+      description: Retrieve a resource by its ID.
+      parameters:
+        - name: id
+          in: path
+          description: ID of the resource to retrieve.
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Resource retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+        '404':
+          description: Resource not found.
+    put:
+      summary: Update a resource
+      description: Update an existing resource with the provided details.
+      parameters:
+        - name: id
+          in: path
+          description: ID of the resource to update.
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResourceInput'
+      responses:
+        '200':
+          description: Resource updated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Resource'
+        '404':
+          description: Resource not found.
+    delete:
+      summary: Delete a resource
+      description: Delete a resource by its ID.
+      parameters:
+        - name: id
+          in: path
+          description: ID of the resource to delete.
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Resource deleted successfully.
+        '404':
+          description: Resource not found.
+components:
+  schemas:
+    Resource:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        description:
+          type: string
+        price:
+          type: number
+    ResourceInput:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        price:
+          type: number
+      required:
+        - name
+        - description
+        - price
